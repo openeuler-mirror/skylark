@@ -24,17 +24,15 @@ from logger import LOGGER
 class MsrLibrary:
     def __init__(self):
         self.c_lib = ctypes.cdll.LoadLibrary("/usr/lib/libskylarkmsr.so")
-        self.max_cpu_nums = 0
 
     def allocate_fd_percpu(self, max_cpu_nums):
-        self.max_cpu_nums = max_cpu_nums
         ret = self.c_lib.allocate_fd_percpu(max_cpu_nums)
         if ret:
             LOGGER.error("Failed to calloc fd_percpu!")
             raise OSError
 
     def clear_memory(self):
-        self.c_lib.free_fd_percpu(self.max_cpu_nums)
+        self.c_lib.free_fd_percpu()
 
     def get_cpu_microarch(self):
         return self.c_lib.get_cpu_microarch()
