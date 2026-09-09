@@ -14,6 +14,24 @@ KillSignal=SIGTERM
 KillMode=control-group
 Restart=on-failure
 RestartSec=1
+# Sandbox hardening that does not conflict with skylark's required
+# access to /proc/sys, /sys/fs, /dev/cpu/*/msr and libvirt socket.
+# /run (pid file) and /var/log (log rotation) stay writable below.
+NoNewPrivileges=yes
+ProtectHome=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ReadWritePaths=/run /var/log
+ProtectClock=yes
+ProtectHostname=yes
+ProtectKernelLogs=yes
+RestrictNamespaces=yes
+RestrictRealtime=yes
+LockPersonality=yes
+RestrictSUIDSGID=yes
+SystemCallArchitectures=native
+UMask=0027
+RestrictAddressFamilies=AF_UNIX AF_NETLINK
 
 [Install]
 WantedBy=multi-user.target
