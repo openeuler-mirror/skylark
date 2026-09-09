@@ -191,7 +191,7 @@ def create_daemon():
         else:
             os._exit(0)
         os.chdir('/')
-        os.umask(0)
+        os.umask(0o022)
         os.setsid()
         func_daemon()
 
