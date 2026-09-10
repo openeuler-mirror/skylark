@@ -28,6 +28,7 @@
 #define inte                0x49656e69
 
 int *fd_percpu;
+static int fd_percpu_max_num;
 
 typedef struct StructPerf {
     unsigned long long aperf;
@@ -91,15 +92,16 @@ int allocate_fd_percpu(int max_cpu_num)
     if (fd_percpu == NULL) {
         return -1;
     }
+    fd_percpu_max_num = max_cpu_num;
     return 0;
 }
 
-void free_fd_percpu(int max_cpu_num)
+void free_fd_percpu(void)
 {
     int i;
 
     if (fd_percpu != NULL) {
-        for (i = 0; i < max_cpu_num; i++) {
+        for (i = 0; i < fd_percpu_max_num; i++) {
             if (fd_percpu[i]) {
                 close(fd_percpu[i]);
             }
@@ -107,6 +109,7 @@ void free_fd_percpu(int max_cpu_num)
 
         free(fd_percpu);
         fd_percpu = NULL;
+        fd_percpu_max_num = 0;
     }
 }
 
@@ -122,6 +125,10 @@ static int get_msr_fd(int cpu)
 {
     char pathname[32];
     int fd;
+
+    if (cpu < 0 || cpu >= fd_percpu_max_num) {
+        return -1;
+    }
 
     fd = fd_percpu[cpu];
     if (fd) {

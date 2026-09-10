@@ -191,7 +191,7 @@ def create_daemon():
         else:
             os._exit(0)
         os.chdir('/')
-        os.umask(0)
+        os.umask(0o022)
         os.setsid()
         func_daemon()
 
@@ -217,7 +217,7 @@ def setup_vm_env():
             LIBVIRT_URI = 'qemu:///system'
         else:
             LOGGER.error('Unknown VMM type {}!'.format(LIBVIRT_DRIVE_TYPE))
-            os._exit(0)
+            os._exit(1)
         LOGGER.info('The VMM type is {}'.format(LIBVIRT_DRIVE_TYPE))
 
 
@@ -232,20 +232,20 @@ def check_dev_msr():
         child.communicate(timeout=5)
         if child.returncode:
             LOGGER.error("No /dev/cpu/0/msr and failed to execute modprobe msr!")
-            os._exit(0)
+            os._exit(1)
 
     if not os.access(MSR_PATH, os.R_OK):
         LOGGER.error(MSR_PATH + " open failed, try chown or chmod +r "
                                 "/dev/cpu/*/msr")
         if os.getuid() != 0:
             LOGGER.error("Or simply run skylark as root.")
-        os._exit(0)
+        os._exit(1)
 
 
 def check_os_platform():
     if platform.system() != "Linux":
         LOGGER.warning("Skylark only supports linux platform.")
-        os._exit(0)
+        os._exit(1)
 
 
 def check_cpu_arch():
@@ -260,7 +260,7 @@ def check_cpu_arch():
     child.stdout.close()
     if ret == -1:
         LOGGER.warning("Skylark only supports x86 architecture.")
-        os._exit(0)
+        os._exit(1)
 
     try:
         extern_lib = MsrLibrary()
@@ -272,7 +272,7 @@ def check_cpu_arch():
         genuine_intel = extern_lib.get_cpu_microarch()
     if not genuine_intel:
         LOGGER.warning("Skylark only supports Intel architecture.")
-        os._exit(0)
+        os._exit(1)
 
 
 def main():

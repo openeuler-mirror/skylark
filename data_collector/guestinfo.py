@@ -66,8 +66,9 @@ class DomainInfo:
             self.package_usage_dict[package] = 0
 
         priority_info = re.search("<partition>/(.*)</partition>", domain.XMLDesc())
-        if not priority_info.groups() or len(priority_info.groups()) != 1:
-            LOGGER.error("Cgroup setting (%s) in XML is wrong!" % priority_info)
+        if not priority_info or len(priority_info.groups()) != 1:
+            LOGGER.error("Domain %s(%d) cgroup partition setting in XML is missing or wrong!"
+                         % (self.domain_name, self.domain_id))
             return -1
         if priority_info.groups()[0] == HIGH_PRIORITY or \
            priority_info.groups()[0] == DEFAULT_PRIORITY:
